@@ -9,15 +9,73 @@ db = mysql.connector.connect(
 
 cursor = db.cursor()
 
-def get_items():
-    cursor.execute("SELECT * FROM pantry_items")
-    return cursor.fetchall()
-
-def add_item(name, quantity, category):
+def add_item(name, quantity, category, expiry_date):
     query = """
     INSERT INTO pantry_items
-    (item_name, quantity, category)
-    VALUES (%s,%s,%s)
+    (item_name, quantity, category, expiry_date)
+    VALUES (%s, %s, %s, %s)
     """
-    cursor.execute(query, (name, quantity, category))
+    cursor.execute(query, (name, quantity, category, expiry_date))
     db.commit()
+    return "Item Added Successfully"
+
+def get_all_items():
+    query = "SELECT * FROM pantry_items"
+    cursor.execute(query)
+    return cursor.fetchall()
+
+def search_item(item_name):
+    query = """
+    SELECT * FROM pantry_items
+    WHERE item_name = %s
+    """
+    cursor.execute(query, (item_name,))
+    return cursor.fetchall()
+
+def update_quantity(item_id, quantity):
+    query = """
+    UPDATE pantry_items
+    SET quantity = %s
+    WHERE item_id = %s
+    """
+    cursor.execute(query, (quantity, item_id))
+    db.commit()
+    return "Quantity Updated"
+
+def update_expiry(item_id, expiry_date):
+    query = """
+    UPDATE pantry_items
+    SET expiry_date = %s
+    WHERE item_id = %s
+    """
+    cursor.execute(query, (expiry_date, item_id))
+    db.commit()
+    return "Expiry Date Updated"
+
+def delete_item(item_id):
+    query = """
+    DELETE FROM pantry_items
+    WHERE item_id = %s
+    """
+    cursor.execute(query, (item_id,))
+    db.commit()
+    return "Item Deleted"
+
+def expiring_items():
+    query = """
+    SELECT *
+    FROM pantry_items
+    WHERE expiry_date <= CURDATE()
+    """
+    cursor.execute(query)
+    return cursor.fetchall()
+
+def total_items():
+    query = """
+    SELECT COUNT(*)
+    FROM pantry_items
+    """
+    cursor.execute(query)
+    return cursor.fetchone()
+
+print("Pantry Management Backend Ready")
