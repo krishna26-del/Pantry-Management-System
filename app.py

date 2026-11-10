@@ -1,0 +1,23 @@
+import mysql.connector
+
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="password",
+    database="pantry_db"
+)
+
+cursor = db.cursor()
+
+def get_items():
+    cursor.execute("SELECT * FROM pantry_items")
+    return cursor.fetchall()
+
+def add_item(name, quantity, category):
+    query = """
+    INSERT INTO pantry_items
+    (item_name, quantity, category)
+    VALUES (%s,%s,%s)
+    """
+    cursor.execute(query, (name, quantity, category))
+    db.commit()
